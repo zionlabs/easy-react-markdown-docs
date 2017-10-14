@@ -19,11 +19,12 @@
   "author": "Josh Pagley",
   "license": "MIT",
   "dependencies": {
+    "glob": "^7.1.2",
     "react-docgen": "^2.19.0",
     "react-docgen-markdown-renderer": "^1.0.1",
     "yargs": "^9.0.1"
   },
   "bin": {
-    "build-docs": "./index.js"
+    "erd": "./index.js"
   }
 }

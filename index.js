@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const argv = require('yargs').argv
+const glob = require('glob');
 const reactDocgen = require('react-docgen');
 const ReactDocGenMarkdownRenderer = require('react-docgen-markdown-renderer');
 
@@ -35,34 +36,39 @@ let docs = '';
  */
 function generateComponentDocs(componentNames, docs, cb) {
 
-  if (componentNames < 1) {
-      
-    return cb(docs); 
-  }
+  if (componentNames < 1) return cb(docs);
   
   const name = componentNames.pop();
-  const componentPath = path.resolve(componentDirectoryPath, name, 'index.js');
+  const componentPath = path.resolve(componentDirectoryPath, name);
 
-  fs.readFile(componentPath, (error, content) => {
-    if (error) throw error;
+  glob(`${componentPath}/?(*.js|*.jsx)`, {}, (error, files) => {
+    const fileName = files[0];
 
-    const doc = reactDocgen.parse(content);
+    fs.readFile(fileName, (error, content) => {
+      if (error) throw error;
 
-    docs += renderer.render(
-      /* The path to the component, used for linking to the file. */
-      componentPath,
-      /* The actual react-docgen AST */
-      doc,
-      /* Array of component ASTs that this component composes*/
-      []
-    );
+      const doc = reactDocgen.parse(content);
 
-    generateComponentDocs(componentNames, docs, cb); 
+      docs += renderer.render(
+        /* The path to the component, used for linking to the file. */
+        componentPath,
+        /* The actual react-docgen AST */
+        doc,
+        /* Array of component ASTs that this component composes*/
+        []
+      );
 
-  });
+      generateComponentDocs(componentNames, docs, cb); 
+
+    });
+
+  })
 
 }
 
+/**
+ * Step 3: Recursively retrieve markdown documentation for each component
+ */
 function writeDocumationToFile(finalDocumentation) {
 
   const documentationPath = `${path.resolve(__dirname, docsDirectoryPath)}/components${renderer.extension}`;
