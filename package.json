@@ -1,0 +1,29 @@
+{
+  "name": "easy-react-markdown-docs",
+  "version": "1.0.0",
+  "description": "Easily generate documentation in markdown for your react components",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "keywords": [
+    "React",
+    "ReactJS",
+    "react.js",
+    "markdown",
+    "docs",
+    "documentation",
+    "react",
+    "components"
+  ],
+  "author": "Josh Pagley",
+  "license": "MIT",
+  "dependencies": {
+    "react-docgen": "^2.19.0",
+    "react-docgen-markdown-renderer": "^1.0.1",
+    "yargs": "^9.0.1"
+  },
+  "bin": {
+    "build-docs": "./index.js"
+  }
+}
