@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const argv = require('yargs').argv
+const argv = require('yargs').argv;
 const glob = require('glob');
 const reactDocgen = require('react-docgen');
 const ReactDocGenMarkdownRenderer = require('react-docgen-markdown-renderer');
@@ -11,7 +11,8 @@ const componentDirectoryArg = argv.path || './components';
 const docsDirectoryArg = argv.docs || './docs';
 
 const renderer = new ReactDocGenMarkdownRenderer({
-  componentsBasePath: process.cwd() 
+  componentsBasePath: process.cwd(),
+  template: require('./template')
 });
 
 const componentDirectoryPath = path.join(process.cwd(), componentDirectoryArg);
@@ -24,45 +25,65 @@ if (!fs.existsSync(docsDirectoryPath)) {
   console.log('Error cannot find directory %s to save documation', docsDirectoryPath); 
 }
 
-/**
- * Step 1: Get list of component names
- */
-const componentNames = fs.readdirSync(componentDirectoryPath);
-
+//React component documentation
 let docs = '';
+
+/**
+ * Step 1: Get list of components
+ */
+glob(`${componentDirectoryPath}/**/*.{js,jsx}`, {dot:true}, (error, files) => {
+
+  //Ignore test and spec files
+  const filteredFiles = files.filter((filePath) => {
+    return filePath.match(/spec.js|test.js|spec.jsx|test.jsx/g) ? false : true;
+  });
+
+  generateComponentDocs(filteredFiles, docs, (finalDocumentation) => {
+    writeDocumationToFile(finalDocumentation);
+  })
+});
 
 /**
  * Step 2: Recursively retrieve markdown documentation for each component
  */
-function generateComponentDocs(componentNames, docs, cb) {
+function generateComponentDocs(files, docs, cb) {
 
-  if (componentNames < 1) return cb(docs);
+  if (files < 1) return cb(docs);
   
-  const name = componentNames.pop();
-  const componentPath = path.resolve(componentDirectoryPath, name);
+  const filePath = files.pop();
 
-  glob(`${componentPath}/?(*.js|*.jsx)`, {}, (error, files) => {
-    const fileName = files[0];
+  fs.readFile(filePath, (error, content) => {
+    if (error) throw error;
 
-    fs.readFile(fileName, (error, content) => {
-      if (error) throw error;
+    const doc = reactDocgen.parse(content);
 
-      const doc = reactDocgen.parse(content);
+    /**
+     * To retrieve the proper component name using structure
+     *
+     * ./components
+     *   /Button
+     *    ./index.js
+     *    ./style.css
+     *    ./etc
+     *
+     * We need to get the name of the parent folder of the index.js file.
+     */
+    const directories = filePath.split('/');
+    const componentName = directories[directories.length - 2];
 
-      docs += renderer.render(
-        /* The path to the component, used for linking to the file. */
-        componentPath,
-        /* The actual react-docgen AST */
-        doc,
-        /* Array of component ASTs that this component composes*/
-        []
-      );
+    docs += `## ${componentName}\n`;
+    docs += renderer.render(
+      /* The path to the component, used for linking to the file. */
+      filePath,
+      /* The actual react-docgen AST */
+      doc,
+      /* Array of component ASTs that this component composes*/
+      []
+    );
 
-      generateComponentDocs(componentNames, docs, cb); 
+    generateComponentDocs(files, docs, cb); 
 
-    });
-
-  })
+  });
 
 }
 
@@ -79,9 +100,5 @@ function writeDocumationToFile(finalDocumentation) {
   });
 
 }
-
-generateComponentDocs(componentNames, docs, (finalDocumentation) => {
-  writeDocumationToFile(finalDocumentation);
-})
 
 

@@ -21,7 +21,7 @@ erd --path=<react_components_directory_path> --docs=<docs-directory-path>
 
 Make sure that both your component and docs directories are valid and exist before running the script.
 
-After running the script a file called `components.md` will be place in your docs (specified or default) directory.
+After running the script a file called `components.md` will be placed in your docs (specified or default) directory.
 
 ## HOW TO
 
@@ -29,8 +29,9 @@ After running the script a file called `components.md` will be place in your doc
 * **Component Arcitecture:** Components should follow:
 
 ```
-//It will look for either .js or .jsx files. 
-//Any files that contian __test__ in the name will be ignored.
+//It will look for .js and .jsx files. 
+//Supports component nesting within the specified components directory.
+//Any files that contain test.js, spec.js, test.jsx, and spec.jsx in the name will be ignored.
 
 ./<component_directory>
 	./Button
