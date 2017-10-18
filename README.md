@@ -13,7 +13,7 @@ npm install --save easy-react-markdown-docs
 Run in terminal:
 
 ```
-erd --path=<react_components_directory_path> --docs=<docs-directory-path>
+erd --path <react_components_directory_path> --docs <docs-directory-path>
 ```
 * `erd` stands for "easy react docs".
 * `--path` defaults to `./src/components`
@@ -36,5 +36,29 @@ After running the script a file called `components.md` will be placed in your do
 ./<component_directory>
 	./Button
 		./*{.js|.jsx}
+
+
+```
 		
+You can nest components under folders for better organization in the component directory.
+
+```
+src/
+  componets/
+    /*Single Component Example*/
+    Button/ 
+      index.js
+      index.test.js
+      style.scss
+    /*Nested Components Example*/
+    Notifications/
+      Alert/ 
+        index.js
+        index.test.js
+        style.scss
+      DismissIcon/ 
+        index.js
+        index.test.js
+        style.scss
+
 ```
