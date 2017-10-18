@@ -1,6 +1,6 @@
 {
   "name": "easy-react-markdown-docs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Easily generate documentation in markdown for your react components",
   "main": "index.js",
   "scripts": {
